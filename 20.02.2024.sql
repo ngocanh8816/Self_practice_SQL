@@ -70,3 +70,10 @@ from
     from logs
     ) cte
 where num = after_num_1 and num = after_num_2
+
+--1527. Patients With a Condition: https://leetcode.com/problems/patients-with-a-condition/?envType=study-plan-v2&envId=top-sql-50
+Trong PostgreSQL, biểu tượng "~" thường được sử dụng trong các phép toán tìm kiếm mẫu theo kiểu biểu thức chính quy (regular expression). Các toán tử biểu thức chính quy trong PostgreSQL bao gồm:
+1. ~ : Trả về true nếu chuỗi khớp với biểu thức chính quy.
+2. ~* : Trả về true nếu chuỗi khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
+3. !~ : Trả về true nếu chuỗi không khớp với biểu thức chính quy.
+4. !~* : Trả về true nếu chuỗi không khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
