@@ -69,6 +69,12 @@ Biểu thức chính quy trong SQL là một công cụ mạnh mẽ để tìm k
 
 Trong PostgreSQL, biểu thức chính quy thường được sử dụng với toán tử ~ hoặc ~* (không phân biệt chữ hoa chữ thường)
 
+Trong PostgreSQL, biểu tượng "~" thường được sử dụng trong các phép toán tìm kiếm mẫu theo kiểu biểu thức chính quy (regular expression). Các toán tử biểu thức chính quy trong PostgreSQL bao gồm:
+1. `~`: Trả về true nếu chuỗi khớp với biểu thức chính quy.
+2. `~*`: Trả về true nếu chuỗi khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
+3. `!~`: Trả về true nếu chuỗi không khớp với biểu thức chính quy.
+4. `!~*`: Trả về true nếu chuỗi không khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
+
 ### Nếu Regex không xác định ký tự `^` và `$` thì điều gì sẽ xảy ra?
 
 Nếu biểu thức chính quy đó không có ký tự `^` và `$`, nó sẽ có ý nghĩa khác. Cụ thể, nó sẽ không yêu cầu bắt đầu và kết thúc của chuỗi phải khớp với mẫu regex, mà chỉ cần tìm một phần của chuỗi phù hợp với mẫu đó. Điều này có thể dẫn đến việc khớp nhiều kết quả hơn so với khi có ký tự `^` và `$`.
