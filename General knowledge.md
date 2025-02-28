@@ -26,3 +26,24 @@
 5. ```REGEXP_SPLIT_TO_TABLE(string, pattern)```: Chia chuỗi thành các hàng của bảng dựa trên biểu thức chính quy.
 
 6. ```CONCAT_WS(separator, str1, str2, ...)```: Nối các chuỗi lại với nhau, có thêm ký tự phân cách.
+
+### Ký tự đại diện trong SQL
+1. ```%```: Đại diện cho số không hoặc nhiều ký tự.
+
+    'bl%' sẽ có các kết quả như: bl, black, blue, blob.
+
+2. ```_```: Đại diện cho một ký tự.
+
+    'h_t' sẽ có các kết quả như: hot, hat, hit.
+
+3. ```[]```: Đại diện cho bất kỳ ký tự nào trong dấu ngoặc.
+
+    h[oa]t sẽ có các kết quả như: hot, hat nhưng không có hit.
+
+4. ```^```: Đại diện cho bất kỳ ký tự nào không ở trong dấu ngoặc.
+
+    h[^oa]t sẽ có các kết quả như: hit nhưng không có hot, hat.
+
+5. ```-```: Đại diện cho một loạt các ký tự.
+
+    c[a-b]t sẽ có các kết quả như: cat, cbt.
