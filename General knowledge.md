@@ -40,10 +40,26 @@
 
     h[oa]t sẽ có các kết quả như: hot, hat nhưng không có hit.
 
-4. ```^```: Đại diện cho bất kỳ ký tự nào không ở trong dấu ngoặc.
+4. ```[^]```: Đại diện cho bất kỳ ký tự nào không ở trong dấu ngoặc.
 
     h[^oa]t sẽ có các kết quả như: hit nhưng không có hot, hat.
 
 5. ```-```: Đại diện cho một loạt các ký tự.
 
     c[a-b]t sẽ có các kết quả như: cat, cbt.
+
+6. ```^```: Bắt đầu của chuỗi
+
+7. ```$```: Kết thúc của chuỗi
+
+8. ```.```: Bất kỳ ký tự nào
+
+9. ```*```: 0 hoặc nhiều lần xuất hiện của ký tự trước đó
+
+10. ```+```: 1 hoặc nhiều lần xuất hiện của ký tự trước đó
+
+11. ```[a-z]```: Khớp với ký tự chữ cái (chữ thường)
+
+12. ```[0-9]```: Khớp với ký tự chữ số (từ 0 đến 9)
+
+13. ```[A-Z]```: Khớp với ký tự chữ cái (chữ hoa)
