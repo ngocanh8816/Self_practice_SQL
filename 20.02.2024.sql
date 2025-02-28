@@ -72,8 +72,34 @@ from
 where num = after_num_1 and num = after_num_2
 
 --1527. Patients With a Condition: https://leetcode.com/problems/patients-with-a-condition/?envType=study-plan-v2&envId=top-sql-50
+/*
 Trong PostgreSQL, biểu tượng "~" thường được sử dụng trong các phép toán tìm kiếm mẫu theo kiểu biểu thức chính quy (regular expression). Các toán tử biểu thức chính quy trong PostgreSQL bao gồm:
 1. ~ : Trả về true nếu chuỗi khớp với biểu thức chính quy.
 2. ~* : Trả về true nếu chuỗi khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
 3. !~ : Trả về true nếu chuỗi không khớp với biểu thức chính quy.
 4. !~* : Trả về true nếu chuỗi không khớp với biểu thức chính quy không phân biệt chữ hoa chữ thường.
+*/
+
+--1517. Find Users With Valid E-Mails: https://leetcode.com/problems/find-users-with-valid-e-mails/description/?envType=study-plan-v2&envId=top-sql-50
+select
+    user_id,
+    name,
+    mail
+from users
+where mail ~ '^[a-zA-Z]+[-a-zA-Z0-9._]*@leetcode\.com$'
+
+^: Ký hiệu bắt đầu của chuỗi. Nó đảm bảo rằng biểu thức regex khớp từ đầu chuỗi.
+
+[a-zA-Z]+: Khớp với một hoặc nhiều ký tự chữ cái (chữ hoa hoặc chữ thường).
+
+[a-zA-Z0-9_.-]*: Khớp với 0 hoặc nhiều ký tự chữ cái, chữ số, dấu chấm (.), dấu gạch dưới (_), hoặc dấu gạch ngang (-).
+
+@leetcode\.com: Khớp với chuỗi chính xác @leetcode.com. Ký tự . được thoát bằng dấu gạch chéo ngược (\) vì trong regex, . đại diện cho bất kỳ ký tự nào.
+
+$: Ký hiệu kết thúc của chuỗi. Nó đảm bảo rằng biểu thức regex khớp đến hết chuỗi.
+
+--Kiểm tra xem giá trị của cột mail có bắt đầu bằng một hoặc nhiều ký tự chữ cái (không phân biệt hoa thường) ([a-zA-Z]+).
+
+--Theo sau là 0 hoặc nhiều ký tự chữ cái, chữ số, dấu chấm, dấu gạch dưới, hoặc dấu gạch ngang ([a-zA-Z0-9_.-]*).
+
+--Kết thúc với chuỗi chính xác @leetcode.com.
