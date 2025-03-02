@@ -99,6 +99,71 @@ $: Ký hiệu kết thúc của chuỗi. Nó đảm bảo rằng biểu thức r
 
 --Kết thúc với chuỗi chính xác @leetcode.com.
 
-Trong biểu thức chính quy trên, không nên đặt dấu gạch ngang `(-)` nằm trong một khoảng ký tự không được thoát ra (escaped), dẫn đến lỗi "Invalid regular expression".
+Trong biểu thức chính quy trên, không nên đặt dấu gạch ngang (-) nằm trong một khoảng ký tự không được thoát ra (escaped), dẫn đến lỗi "Invalid regular expression".
 Để sửa lỗi này, ta cần đưa dấu gạch ngang vào vị trí đầu hoặc cuối của nhóm ký tự. Ví dụ sửa như:
 WHERE mail ~ '^[a-zA-Z]+[a-zA-Z0-9._-]*@leetcode\.com$' hoặc WHERE mail ~ '^[a-zA-Z]+[-a-zA-Z0-9._]*@leetcode\.com$'
+
+--1341. Movie Rating: https://leetcode.com/problems/movie-rating/description/?envType=study-plan-v2&envId=top-sql-50
+with cte_1 as
+(
+select
+user_id,
+count(*) as count_movie
+from movierating
+group by user_id
+),
+cte_2 as
+(
+select
+movie_id,
+avg(rating) as avg_rating
+from movierating
+where to_char(created_at,'yyyy-mm') = '2020-02'
+group by movie_id
+)
+
+(
+select
+min(name) as results
+from cte_1
+join users B on cte_1.user_id = B.user_id
+where count_movie in (select max(count_movie) from cte_1)
+)
+union all
+(
+select
+min(title) as results
+from cte_2
+join movies C on cte_2.movie_id = C.movie_id
+where avg_rating in (select max(avg_rating) from cte_2)
+)
+
+--Hoặc cách giải khác
+select name as results
+from
+(
+select
+name,
+count(*) as count_movie
+from movierating A
+join users B on A.user_id = B.user_id
+group by A.user_id,name
+order by count_movie desc,name
+limit 1
+)
+
+union all
+
+select title as results
+from
+(
+select
+title,
+avg(rating) as avg_rating
+from movierating A
+join movies B on A.movie_id = B.movie_id
+where to_char(created_at,'yyyy-mm') = '2020-02'
+group by A.movie_id, title
+order by avg_rating desc, title
+limit 1
+)
