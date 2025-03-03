@@ -113,3 +113,97 @@ GROUP BY 1;
 ```
 
 Ở đây, GROUP BY 1 thực chất là viết tắt của GROUP BY column1
+
+## STORED PROCEDURE
+Stored Procedure là một thủ tục (phương thức), hay một tập hợp các câu lệnh SQL để thực hiện 1 nhiệm vụ nào đó
+
+Trong Stored Procedure có 3 tham số chính là:
+
+- IN: tham số đầu vào, ta sẽ truyền giá trị cho những tham số đó
+- OUT: tham số đầu ra, nó sẽ nhận giá trị từ kết quả của phần body Stored Procedure
+- INOUT: có tác dụng tham chiếu, nó có thể truyền giá trị cho Stored Procedure và cũng có thể lấy giá trị từ body Stored Procedure
+
+### Cú pháp của Stored Procedure
+```
+CREATE OR REPLACE PROCEDURE procedure_name (parameter_list)
+LANGUAGE 'plpgsql'
+AS $$
+BEGIN
+    --SQL statements
+END
+$$
+```
+`parameter_list`: danh sách các tham số đầu vào và đầu ra (nếu có) của Stored Procedure. Mỗi tham số được khai báo dưới dạng:
+```
+para_name data_type [IN | OUT | INOUT]
+```
+- param_name: tên của tham số
+- data_type: kiểu dữ liệu của tham số
+- IN (mặc định): chỉ định rằng tham số là đầu vào dùng để truyền giá trị từ người gọi váo thủ tục hoặc hàm. Giá trị của tham số này chỉ có thể đọc, không thể thay đổi trong quá trình thực thi.
+- OUT: chỉ định rằng tham số là đầu ra. Được sử dụng để truyền giá trị từ thủ tục hoặc hàm ra người gọi. Biến đầu ra sẽ được gán giá trị trong quá trình thực thi của thủ tục hoặc hàm. Giá trị của tham số này có thể thay đổi trong quá trình thực thi và kết quả sẽ được trả về cho người gọi.
+- INOUT: Tham số INOUT là sự kết hợp giữa tham số IN và OUT. Nó có thể nhận giá trị từ người gọi và giá trị này có thể thay đổi trong quá trình thực thi. Kết quả cuối cùng sẽ được trả về cho người gọi. Giá trị của tham số này có thể đọc và thay đổi trong quá trình thực thi, và giá trị cuối cùng sẽ được trả về cho người gọi.
+- `LANGUAGE plpgsql`: chỉ định ngôn ngữ lập trình được sử dụng trong Stored Procudure. Trong trường hợp này, đó là PL/pgSQL, ngôn ngữ mở rộng của SQL trên PostgreSQL
+- `AS $$ ...$$`: khung mã của Stored Procedure. Mọi câu lệnh PL/pgSQL được đặt trong khung này. Ký hiệu $$ được sử dụng để phân tách mã PL/pgSQL từ câu lệnh SQL bên ngoài
+- `BEGIN...END`: thân của Stored Procedure, nơi bạn đặt các câu lệnh SQL và logic xử lý
+
+Khi thực thi
+```
+CALL procedure_name(parameter_list);
+```
+Xóa Stored Procedure đã tạo
+```
+DROP PROCEDURE procedure_name (parameter_type) hoặc DROP PROCEDURE procedure_name (parameter_list);
+```
+- `procedure_name` là tên của Stored Procedure mà bạn muốn xóa.
+- `parameter_types` là danh sách các kiểu dữ liệu của các tham số mà Stored Procedure đó sử dụng. Việc chỉ định các kiểu dữ liệu tham số là bắt buộc để xác định chính xác Stored Procedure bạn muốn xóa.
+### AS $BODY$ có nghĩa là gì khi khai báo trong Stored Procedure?
+Trong PostgreSQL, khi bạn thấy ký hiệu `AS $BODY$ ... $BODY$`, đây là cách để phân tách mã của Stored Procedure (hoặc Function) khỏi các câu lệnh SQL khác. BODY là một định danh có thể được chọn tùy ý, nhưng thường được sử dụng để chỉ ra rằng đoạn mã giữa các ký hiệu đó là nội dung chính của Procedure hoặc Function (ở đây chính là đoạn mã giữa `BEGIN` và `END`).
+
+Cú pháp này cũng giống như sử dụng $$...$$ mà bạn đã thấy trước đây. Bạn có thể sử dụng bất kỳ tên nào thay thế BODY để bao quanh mã của bạn. Ví dụ:
+```
+CREATE OR REPLACE PROCEDURE example_procedure()
+LANGUAGE plpgsql
+AS $example$
+BEGIN
+    -- SQL statements
+END;
+$example$;
+```
+Trong ví dụ trên, `example` được sử dụng thay thế cho `BODY`, và các đoạn mã của Procedure được bao quanh bởi `$example$`.
+
+### Câu lệnh DECLARE trong Stored Procedure có tác dụng gì và ứng dụng như thế nào?
+Trong PostgreSQL, câu lệnh DECLARE thường được sử dụng trong các thủ tục lưu trữ (Stored Procedures) hoặc hàm (Functions) để khai báo các biến cục bộ. Các biến này có thể được sử dụng trong suốt quá trình thực thi của thủ tục hoặc hàm để lưu trữ và thao tác với dữ liệu tạm thời.
+
+Cú pháp:
+```
+DECLARE
+    variable_name data_type [DEFAULT value]
+```
+- Khai báo các biến cục bộ: cho phép tạo ra các biến mà bạn có thể sử dụng trong suốt quá trình thực thi thủ tục hoặc hàm
+- Khởi tạo biến: bạn có thể gán giá trị mặc định cho biến ngay khi khai báo bằng cách sử dụng từ khóa `DEFAULT`
+
+Ví dụ:
+```
+CREATE OR REPLACE PROCEDURE example_procedure()
+LANGUAGE 'plpgsql'
+AS $$
+DECLARE
+    -- Khai báo biến với giá trị mặc định
+    total_salary NUMERIC DEFAULT 0; --hoặc total_salary NUMERIC := 0
+    employee_count INT DEFAULT 100; --hoặc emplyee_count INT := 100
+BEGIN
+    -- Các câu lệnh SQL
+    SELECT SUM(salary) INTO total_salary FROM employees;
+    SELECT COUNT(*) INTO employee_count FROM employees;
+    RAISE NOTICE 'Total salary: %', total_salary;
+    RAISE NOTICE 'Employee count: %', employee_count;
+END;
+$$;
+```
+- `SELECT SUM(salary) INTO total_salary FROM employees`: Tính tổng số lương của tất cả nhân viên và gán kết quả vào biến `total_salary`
+- `RAISE NOTICE 'Total salary: %', total_salary`: Hiển thị thông báo chứa giá trị của biến `total_salary`
+
+### Lưu ý:
+Cú pháp `INTO` được sử dụng trong câu lệnh SELECT để gán giá trị từ kết quả của truy vấn SQL vào biến. Tuy nhiên trong trường hợp bạn không thực hiện truy vấn `SELECT` mà chỉ đơn giản gán giá trị cho biến đầu ra thì việc sử dụng cú pháp `INTO` là chưa chính xác
+
+Trong PL/pgSQL, để gán giá trị cho một biến, bạn sử dụng toán tử gán := chứ không phải cú pháp INTO.
