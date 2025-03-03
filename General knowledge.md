@@ -100,3 +100,16 @@ Cụ thể trong biểu thức chính quy (regex):
 
    - Ý nghĩa: Dùng để thoát ký tự đặc biệt trong regex, nghĩa là nó làm cho ký tự đặc biệt tiếp theo được hiểu theo nghĩa đen, không theo nghĩa đặc biệt của regex.
    - Trong regex của bạn: `@leetcode\.com` chứa `\.`, trong đó dấu chấm `(.)` được thoát để đảm bảo rằng nó được hiểu là dấu chấm thực sự trong email, không phải là ký tự đại diện cho bất kỳ ký tự nào khác trong regex.
+
+## CÁC SYNTAX TRUY VẤN NHANH
+Trong SQL, câu lệnh GROUP BY thường được sử dụng để nhóm các hàng có cùng giá trị trong một hoặc nhiều cột, từ đó có thể thực hiện các hàm tổng hợp như COUNT(), SUM(), AVG(), MIN(), MAX(),...
+
+Cụ thể, GROUP BY 1 là cách viết ngắn gọn khi bạn muốn nhóm các kết quả dựa trên cột đầu tiên trong mệnh đề SELECT. Ví dụ:
+
+```
+SELECT column1, COUNT(*)
+FROM your_table
+GROUP BY 1;
+```
+
+Ở đây, GROUP BY 1 thực chất là viết tắt của GROUP BY column1
