@@ -137,11 +137,11 @@ $$
 ```
 para_name data_type [IN | OUT | INOUT]
 ```
-- param_name: tên của tham số
-- data_type: kiểu dữ liệu của tham số
-- IN (mặc định): chỉ định rằng tham số là đầu vào dùng để truyền giá trị từ người gọi váo thủ tục hoặc hàm. Giá trị của tham số này chỉ có thể đọc, không thể thay đổi trong quá trình thực thi.
-- OUT: chỉ định rằng tham số là đầu ra. Được sử dụng để truyền giá trị từ thủ tục hoặc hàm ra người gọi. Biến đầu ra sẽ được gán giá trị trong quá trình thực thi của thủ tục hoặc hàm. Giá trị của tham số này có thể thay đổi trong quá trình thực thi và kết quả sẽ được trả về cho người gọi.
-- INOUT: Tham số INOUT là sự kết hợp giữa tham số IN và OUT. Nó có thể nhận giá trị từ người gọi và giá trị này có thể thay đổi trong quá trình thực thi. Kết quả cuối cùng sẽ được trả về cho người gọi. Giá trị của tham số này có thể đọc và thay đổi trong quá trình thực thi, và giá trị cuối cùng sẽ được trả về cho người gọi.
+- `param_name`: tên của tham số
+- `data_type`: kiểu dữ liệu của tham số
+- `IN` (mặc định): chỉ định rằng tham số là đầu vào dùng để truyền giá trị từ người gọi váo thủ tục hoặc hàm. Giá trị của tham số này chỉ có thể đọc, không thể thay đổi trong quá trình thực thi.
+- `OUT`: chỉ định rằng tham số là đầu ra. Được sử dụng để truyền giá trị từ thủ tục hoặc hàm ra người gọi. Biến đầu ra sẽ được gán giá trị trong quá trình thực thi của thủ tục hoặc hàm. Giá trị của tham số này có thể thay đổi trong quá trình thực thi và kết quả sẽ được trả về cho người gọi.
+- `INOUT`: Tham số INOUT là sự kết hợp giữa tham số IN và OUT. Nó có thể nhận giá trị từ người gọi và giá trị này có thể thay đổi trong quá trình thực thi. Kết quả cuối cùng sẽ được trả về cho người gọi. Giá trị của tham số này có thể đọc và thay đổi trong quá trình thực thi, và giá trị cuối cùng sẽ được trả về cho người gọi.
 - `LANGUAGE plpgsql`: chỉ định ngôn ngữ lập trình được sử dụng trong Stored Procudure. Trong trường hợp này, đó là PL/pgSQL, ngôn ngữ mở rộng của SQL trên PostgreSQL
 - `AS $$ ...$$`: khung mã của Stored Procedure. Mọi câu lệnh PL/pgSQL được đặt trong khung này. Ký hiệu $$ được sử dụng để phân tách mã PL/pgSQL từ câu lệnh SQL bên ngoài
 - `BEGIN...END`: thân của Stored Procedure, nơi bạn đặt các câu lệnh SQL và logic xử lý
@@ -206,4 +206,102 @@ $$;
 ### Lưu ý:
 Cú pháp `INTO` được sử dụng trong câu lệnh SELECT để gán giá trị từ kết quả của truy vấn SQL vào biến. Tuy nhiên trong trường hợp bạn không thực hiện truy vấn `SELECT` mà chỉ đơn giản gán giá trị cho biến đầu ra thì việc sử dụng cú pháp `INTO` là chưa chính xác
 
-Trong PL/pgSQL, để gán giá trị cho một biến, bạn sử dụng toán tử gán := chứ không phải cú pháp INTO.
+Trong PL/pgSQL, để gán giá trị cho một biến, bạn sử dụng toán tử gán `:=` chứ không phải cú pháp `INTO`.
+
+### Khối câu lệnh `Exception` trong Stored Procedure
+Trong stored procedure, phần `EXCEPTION` được sử dụng để xử lý các lỗi và ngoại lệ xảy ra trong quá trình thực thi của Stored Procedure. Nó giúp đảm bảo rằng khi có lỗi xảy ra, bạn có thể bắt lỗi và thực hiện các hành động cần thiết thay vì để lỗi ảnh hưởng đến toàn bộ hệ thống.
+```
+CREATE OR REPLACE PROCEDURE update_employee_salary(
+    emp_id INT,
+    new_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Cập nhật lương cho nhân viên
+    UPDATE employees
+    SET salary = new_salary
+    WHERE id = emp_id;
+
+    -- Nếu không có lỗi, kết thúc stored procedure
+    RETURN;
+
+EXCEPTION
+    WHEN others THEN
+        -- Bắt lỗi và hiển thị thông báo lỗi
+        RAISE NOTICE 'Có lỗi xảy ra: %', SQLERRM;
+        -- Có thể thêm các hành động khác ở đây nếu cần thiết
+END;
+$$;
+```
+- Phần `EXCEPTION...WHEN others THEN` được sử dụng để bắt tất cả các lỗi xảy ra trong quá trình thực thi
+- `RAISE NOTICE 'Có lỗi xảy ra: %', SQLERRM;` là lệnh để hiển thị thông báo lỗi kèm theo thông điệp lỗi (`SQLERRM`)
+Khi sử dụng phần `EXCEPTION`, bạn có thể đảm bảo rằng Stored Procedure của bạn sẽ không bị dừng lại đột ngột khi gặp lỗi và có thể xử lý lỗi một cách hợp lý.
+
+## TỪ KHÓA `DO` TRONG POSTGRESQL
+Trong PostgreSQL, từ khóa `DO` được sử dụng để thực hiện một khối lệnh PL/pgSQL mà không cần phải tạo một hàm lưu trữ (stored function). Điều này rất hữu ích cho các kịch bản mà bạn muốn thực hiện một khối lệnh đơn giản mà không cần lưu lại mã nguồn trong cơ sở dữ liệu. Bạn có thể dùng nó cho các tác vụ tạm thời hoặc kiểm thử mã nguồn.
+
+Cú pháp:
+```
+DO $$
+BEGIN
+    -- Các lệnh PL/pgSQL tại đây
+END $$;
+```
+Ví dụ:
+```
+DO $$
+BEGIN
+    -- Ví dụ đơn giản về việc chèn một bản ghi vào bảng employees
+    INSERT INTO employees (name, position, salary)
+    VALUES ('Jane Doe', 'Manager', 60000);
+
+    -- Ví dụ về việc cập nhật lương của một nhân viên
+    UPDATE employees
+    SET salary = 65000
+    WHERE name = 'John Doe';
+
+    -- Hiển thị thông báo
+    RAISE NOTICE 'Các lệnh đã được thực hiện thành công!';
+END $$;
+```
+## HÀM `RAISE NOTICE` TRONG POSTGRESQL
+Hàm `RAISE NOTIC`E trong PostgreSQL được sử dụng để hiển thị thông báo thông qua hệ thống nhật ký của PostgreSQL. Đây là cách bạn có thể ghi nhận các sự kiện, điểm dừng kiểm thử, hoặc thông báo xử lý trong stored procedure hoặc function, mà không dừng lại thực thi của chương trình.
+
+Cú pháp của `RAISE NOTICE`:
+```
+RAISE NOTICE 'Thông báo: %', giá trị;
+```
+- `%`: tham số `giá trij` sẽ được thay vào vị trí này
+Ví dụ:
+```
+CREATE OR REPLACE PROCEDURE update_employee_salary(
+    emp_id INT,
+    new_salary NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Cập nhật lương của nhân viên
+    UPDATE employees
+    SET salary = new_salary
+    WHERE id = emp_id;
+
+    -- Hiển thị thông báo khi cập nhật thành công
+    RAISE NOTICE 'Đã cập nhật lương cho nhân viên có ID % với mức lương mới là %', emp_id, new_salary;
+    
+EXCEPTION
+    WHEN others THEN
+        -- Bắt lỗi và hiển thị thông báo lỗi
+        RAISE NOTICE 'Có lỗi xảy ra: %', SQLERRM;
+END;
+$$;
+```
+- `RAISE NOTICE 'Đã cập nhật lương cho nhân viên có ID % với mức lương mới là %', emp_id, new_salary;`: Thông báo này sẽ hiển thị ID của nhân viên và mức lương mới sau khi cập nhật.
+- `RAISE NOTICE 'Có lỗi xảy ra: %', SQLERRM;`: Thông báo này sẽ hiển thị thông điệp lỗi nếu có lỗi xảy ra.
+## Các mức thông báo khác
+- `RAISE DEBUG`: Sử dụng cho mục đích gỡ lỗi.
+- `RAISE LOG`: Ghi nhật ký mà không hiển thị thông báo cho người dùng.
+- `RAISE INFO`: Hiển thị thông tin bổ sung.
+- `RAISE WARNING`: Hiển thị cảnh báo (không dừng quá trình thực thi).
+- `RAISE EXCEPTION`: Ném ra một ngoại lệ và dừng quá trình thực thi.
