@@ -272,7 +272,7 @@ Cú pháp của `RAISE NOTICE`:
 ```
 RAISE NOTICE 'Thông báo: %', giá trị;
 ```
-- `%`: tham số `giá trij` sẽ được thay vào vị trí này
+- `%`: tham số `giá trị` sẽ được thay vào vị trí này
 Ví dụ:
 ```
 CREATE OR REPLACE PROCEDURE update_employee_salary(
