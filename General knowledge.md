@@ -156,7 +156,7 @@ DROP PROCEDURE procedure_name (parameter_type) hoặc DROP PROCEDURE procedure_n
 ```
 - `procedure_name` là tên của Stored Procedure mà bạn muốn xóa.
 - `parameter_types` là danh sách các kiểu dữ liệu của các tham số mà Stored Procedure đó sử dụng. Việc chỉ định các kiểu dữ liệu tham số là bắt buộc để xác định chính xác Stored Procedure bạn muốn xóa.
-### AS $BODY$ có nghĩa là gì khi khai báo trong Stored Procedure?
+### AS `BODY` có nghĩa là gì khi khai báo trong Stored Procedure?
 Trong PostgreSQL, khi bạn thấy ký hiệu `AS $BODY$ ... $BODY$`, đây là cách để phân tách mã của Stored Procedure (hoặc Function) khỏi các câu lệnh SQL khác. BODY là một định danh có thể được chọn tùy ý, nhưng thường được sử dụng để chỉ ra rằng đoạn mã giữa các ký hiệu đó là nội dung chính của Procedure hoặc Function (ở đây chính là đoạn mã giữa `BEGIN` và `END`).
 
 Cú pháp này cũng giống như sử dụng $$...$$ mà bạn đã thấy trước đây. Bạn có thể sử dụng bất kỳ tên nào thay thế BODY để bao quanh mã của bạn. Ví dụ:
@@ -171,7 +171,7 @@ $example$;
 ```
 Trong ví dụ trên, `example` được sử dụng thay thế cho `BODY`, và các đoạn mã của Procedure được bao quanh bởi `$example$`.
 
-### Câu lệnh DECLARE trong Stored Procedure có tác dụng gì và ứng dụng như thế nào?
+### Câu lệnh `DECLARE` trong Stored Procedure có tác dụng gì và ứng dụng như thế nào?
 Trong PostgreSQL, câu lệnh DECLARE thường được sử dụng trong các thủ tục lưu trữ (Stored Procedures) hoặc hàm (Functions) để khai báo các biến cục bộ. Các biến này có thể được sử dụng trong suốt quá trình thực thi của thủ tục hoặc hàm để lưu trữ và thao tác với dữ liệu tạm thời.
 
 Cú pháp:
