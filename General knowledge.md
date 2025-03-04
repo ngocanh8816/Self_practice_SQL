@@ -305,3 +305,202 @@ $$;
 - `RAISE INFO`: Hiển thị thông tin bổ sung.
 - `RAISE WARNING`: Hiển thị cảnh báo (không dừng quá trình thực thi).
 - `RAISE EXCEPTION`: Ném ra một ngoại lệ và dừng quá trình thực thi.
+
+## FUNCTION TRONG SQL
+### Thông tin chung
+Trong SQL, một function (hàm) là một khối mã có thể tái sử dụng, được dùng để thực hiện một nhiệm vụ cụ thể và trả về một giá trị đơn lẻ. Functions giúp bạn viết mã một cách hiệu quả hơn bằng cách gom các thao tác lặp đi lặp lại vào một chỗ duy nhất.
+
+Có hai loại functions chính trong SQL:
+- `Scalar Functions`: Trả về một giá trị duy nhất, có thể là số, chuỗi, hoặc bất kỳ kiểu dữ liệu nào khác. Ví dụ: `LEN()`, `ROUND()`, `GETDATE()`.
+- `Table-Valued Functions`: Trả về một bảng kết quả, có thể được sử dụng như một bảng trong các câu truy vấn SQL khác.
+
+Cú pháp
+```
+CREATE [OR REPLACE] FUNCTION function_name(
+    param_name1 data_type [DEFAULT default_value],
+    param_name2 data_type [DEFAULT default_value], 
+    ...
+) 
+RETURNS return_type 
+LANGUAGE plpgsql 
+[STABLE | IMMUTABLE | VOLATILE]
+[SECURITY DEFINER | SECURITY INVOKER]
+AS $$
+BEGIN
+    -- Logic của function
+    RETURN return_value;
+END;
+$$;
+```
+Giải thích các thành phần chính:
+
+- `CREATE FUNCTION function_name`: Định nghĩa function, có thể thêm OR REPLACE để cập nhật nếu function đã tồn tại.
+- `param_name data_type`: Danh sách tham số truyền vào.
+- `DEFAULT default_value` (tuỳ chọn): Gán giá trị mặc định cho tham số.
+- `RETURNS return_type`: Kiểu dữ liệu trả về của function.
+- `LANGUAGE plpgsql`: Xác định ngôn ngữ lập trình (PL/pgSQL).
+- `STABLE | IMMUTABLE | VOLATILE` (tuỳ chọn):
+    - `IMMUTABLE`: Function luôn trả về kết quả giống nhau nếu đầu vào giống nhau.
+    - `STABLE`: Không thay đổi dữ liệu nhưng có thể thay đổi theo phiên (session).
+    - `VOLATILE`: Có thể thay đổi dữ liệu (mặc định).
+- `SECURITY DEFINER | SECURITY INVOKER` (tuỳ chọn):
+    - `SECURITY DEFINER`: Function chạy với quyền của người tạo.
+    - `SECURITY INVOKER`: Function chạy với quyền của người gọi (mặc định).
+ 
+Ví dụ
+1. Function tính tổng giá trị đơn hàng
+```
+CREATE OR REPLACE FUNCTION GetTotalPrice(order_id INT) 
+RETURNS DECIMAL(10,2)
+LANGUAGE plpgsql 
+STABLE
+AS $$
+DECLARE 
+    total_price DECIMAL(10,2);
+BEGIN
+    SELECT SUM(price * quantity) INTO total_price FROM OrderDetails WHERE OrderID = order_id;
+    RETURN total_price;
+END;
+$$;
+
+--Gọi Function
+SELECT GetTotalPrice(1);
+```
+3. Function kiểm tra số chẵn hay lẻ
+```
+CREATE FUNCTION IsEven(num INT) 
+RETURNS BOOLEAN 
+LANGUAGE plpgsql 
+IMMUTABLE
+AS $$
+BEGIN
+    RETURN num % 2 = 0;
+END;
+$$;
+
+--Gọi Function
+SELECT IsEven(10);  -- Trả về TRUE
+SELECT IsEven(7);   -- Trả về FALSE
+```
+5. Function trả về nhiều dòng (Table Function)
+```
+CREATE FUNCTION GetOrdersByCustomer(customer_id INT)
+RETURNS TABLE(order_id INT, order_date DATE, total_price DECIMAL)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY 
+    SELECT o.OrderID, o.OrderDate, SUM(od.price * od.quantity)
+    FROM Orders o
+    JOIN OrderDetails od ON o.OrderID = od.OrderID
+    WHERE o.CustomerID = customer_id
+    GROUP BY o.OrderID, o.OrderDate;
+END;
+$$;
+
+--Gọi Function
+SELECT * FROM GetOrdersByCustomer(5);
+```
+Tóm lại:
+- Dùng RETURNS để xác định kiểu dữ liệu trả về (INT, DECIMAL, BOOLEAN, TABLE, v.v.).
+- Dùng RETURN QUERY nếu function trả về nhiều dòng dữ liệu.
+- Luôn khai báo LANGUAGE plpgsql khi viết function bằng PL/pgSQL.
+### `Function` và `Procedure` khác nhau như thế nào?
+Function:
+- Dùng để tính toán và phải trả về 1 giá trị duy nhất (có thể là bảng)
+- Hàm có thể được dùng trong các câu lệnh `SELECT`, `WHERE`, `HAVING`,...
+- Hàm chỉ có thể nhận tham số `IN` đầu vào
+- Hàm có thể được gọi từ Stored Procedure
+
+Procedure:
+- Dùng để thực hiện 1 loạt các thao tác, có thể trả về 1 hoặc nhiều giá trị
+- Procedure có thể chứa cả các tham số `IN`, `OUT` hoặc `INOUT`
+- Procedure không thể được gọi từ hàm
+- Procedure không thể được sử dụng trong các câu lệnh `SELECT`, `WHERE`, `HAVING`,...
+
+### Cách sử dụng `REFCURSOR` trong PostgreSQL
+PostgreSQL có tồn tại kiểu dữ liệu REFCURSOR, và nó được sử dụng để trả về con trỏ (cursor) trỏ đến một tập kết quả của truy vấn. Kiểu dữ liệu này rất hữu ích khi bạn cần xử lý tập dữ liệu lớn từng phần thay vì lấy toàn bộ cùng một lúc.
+
+Lưu ý khi sử dụng
+- Cần chạy trong một transaction (BEGIN; ... COMMIT;) để con trỏ không bị mất. `REFCURSOR` chỉ hoạt động trong một phiên giao dịch (TRANSACTION), nếu phiên kết thúc mà con trỏ chưa đóng thì nó sẽ bị mất.
+- Khi sử dụng REFCURSOR, bạn phải gọi `FETCH` hoặc `MOVE` để truy vấn dữ liệu từ con trỏ.
+- Một function có thể trả về nhiều con trỏ bằng cách trả về kiểu SETOF REFCURSOR.
+
+### Cách khai báo Refcursor
+1. Cách khai báo REFCURSOR bằng `DECLARE` (biến cục bộ)
+```
+CREATE OR REPLACE FUNCTION GetOrdersCursor()
+RETURNS REFCURSOR 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    order_cursor REFCURSOR;
+BEGIN
+    OPEN order_cursor FOR 
+    SELECT OrderID, CustomerID, OrderDate FROM Orders;
+    
+    RETURN order_cursor;
+END;
+$$;
+```
+Cách gọi và lấy dữ liệu
+```
+BEGIN;
+SELECT GetOrdersCursor() INTO my_cursor;
+FETCH ALL FROM my_cursor;  -- Lấy dữ liệu từ con trỏ
+CLOSE my_cursor;
+COMMIT;
+```
+👉 Nhược điểm: `order_cursor` chỉ tồn tại trong function, không thể truyền từ bên ngoài vào.
+2. Cách khai báo `REFCURSOR` trong tham số function
+```
+CREATE OR REPLACE FUNCTION GetOrdersCursor(ref_cursor REFCURSOR)
+RETURNS REFCURSOR 
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    OPEN ref_cursor FOR 
+    SELECT OrderID, CustomerID, OrderDate FROM Orders;
+    
+    RETURN ref_cursor;
+END;
+$$;
+```
+Cách gọi và lấy dữ liệu
+```
+BEGIN;
+DECLARE my_cursor REFCURSOR;  -- Khai báo con trỏ ngoài function
+SELECT GetOrdersCursor('my_cursor');  -- Truyền con trỏ vào function
+FETCH ALL FROM my_cursor;  -- Lấy dữ liệu từ con trỏ
+CLOSE my_cursor;
+COMMIT;
+```
+👉 Ưu điểm: `my_cursor` được truyền từ bên ngoài vào, giúp kiểm soát và tiếp tục sử dụng con trỏ sau khi function kết thúc.
+
+Khi nào dùng cách nào?
+- Dùng `DECLARE` trong function nếu chỉ cần sử dụng con trỏ bên trong function và không cần tiếp tục thao tác với nó bên ngoài.
+- Dùng `REFCURSOR` làm tham số function nếu muốn truyền con trỏ từ bên ngoài vào và tiếp tục thao tác trên con trỏ sau khi function chạy xong.
+
+## Ví dụ về việc sử dụng con trỏ bên ngoài function khi khai báo `Refcursor` trong tham số function
+```
+BEGIN;
+-- 1️⃣ Khai báo con trỏ ngoài function
+DECLARE my_cursor REFCURSOR;
+
+-- 2️⃣ Gọi function để mở con trỏ
+SELECT GetOrdersCursor('my_cursor');
+
+-- 3️⃣ Tiếp tục sử dụng con trỏ để lấy dữ liệu dần dần
+FETCH 1 FROM my_cursor;  -- Lấy 1 dòng đầu tiên
+FETCH 3 FROM my_cursor;  -- Lấy thêm 3 dòng tiếp theo
+FETCH ALL FROM my_cursor; -- Lấy tất cả dòng còn lại
+
+-- 4️⃣ Đóng con trỏ sau khi sử dụng xong
+CLOSE my_cursor;
+COMMIT;
+```
+Đặc điểm của cách này
+- Con trỏ my_cursor vẫn tồn tại bên ngoài function sau khi function kết thúc.
+- Có thể sử dụng các lệnh như FETCH để lấy dữ liệu từng phần (thay vì lấy hết một lúc).
+- Thích hợp để xử lý tập dữ liệu lớn mà không làm hệ thống bị quá tải. Điều này giúp lấy dữ liệu từng phần, tối ưu hiệu suất khi làm việc với tập dữ liệu lớn.
+- Khi không cần dùng nữa, đừng quên CLOSE con trỏ để giải phóng tài nguyên.
