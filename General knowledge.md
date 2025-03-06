@@ -104,7 +104,7 @@ Cụ thể trong biểu thức chính quy (regex):
 ## CÁC SYNTAX TRUY VẤN NHANH
 Trong SQL, câu lệnh GROUP BY thường được sử dụng để nhóm các hàng có cùng giá trị trong một hoặc nhiều cột, từ đó có thể thực hiện các hàm tổng hợp như COUNT(), SUM(), AVG(), MIN(), MAX(),...
 
-Cụ thể, GROUP BY 1 là cách viết ngắn gọn khi bạn muốn nhóm các kết quả dựa trên cột đầu tiên trong mệnh đề SELECT. Ví dụ:
+Cụ thể, `GROUP BY 1` là cách viết ngắn gọn khi bạn muốn nhóm các kết quả dựa trên cột đầu tiên trong mệnh đề SELECT. Ví dụ:
 
 ```
 SELECT column1, COUNT(*)
@@ -119,9 +119,9 @@ Stored Procedure là một thủ tục (phương thức), hay một tập hợp 
 
 Trong Stored Procedure có 3 tham số chính là:
 
-- IN: tham số đầu vào, ta sẽ truyền giá trị cho những tham số đó
-- OUT: tham số đầu ra, nó sẽ nhận giá trị từ kết quả của phần body Stored Procedure
-- INOUT: có tác dụng tham chiếu, nó có thể truyền giá trị cho Stored Procedure và cũng có thể lấy giá trị từ body Stored Procedure
+- `IN`: tham số đầu vào, ta sẽ truyền giá trị cho những tham số đó
+- `OUT`: tham số đầu ra, nó sẽ nhận giá trị từ kết quả của phần body Stored Procedure
+- `INOUT`: có tác dụng tham chiếu, nó có thể truyền giá trị cho Stored Procedure và cũng có thể lấy giá trị từ body Stored Procedure
 
 ### Cú pháp của Stored Procedure
 ```
@@ -129,9 +129,9 @@ CREATE OR REPLACE PROCEDURE procedure_name (parameter_list)
 LANGUAGE 'plpgsql'
 AS $$
 BEGIN
-    --SQL statements
-END
-$$
+    --SQL statements;
+END;
+$$;
 ```
 `parameter_list`: danh sách các tham số đầu vào và đầu ra (nếu có) của Stored Procedure. Mỗi tham số được khai báo dưới dạng:
 ```
