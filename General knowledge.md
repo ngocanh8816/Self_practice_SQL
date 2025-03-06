@@ -64,6 +64,38 @@
 
 13. ```[A-Z]```: Khớp với ký tự chữ cái (chữ hoa)
 
+## CÁC HÀM LIÊN QUAN ĐẾN XỬ LÝ THỜI GIAN TRONG SQL
+### Lấy thời gian hiện tại
+1. `NOW()`: Lấy timestamp hiện tại (bao gồm ngày, giờ, phút, giây, múi giờ)
+2. `CURRENT_DATE`: Lấy ngày hiện tại (chỉ gồm năm, tháng, ngày)
+3. `CURRENT_TIME`: Lấy giờ hiện tại (chỉ gồm giờ, phút, giây, múi giờ)
+4. `CURRENT_TIMESTAMP`: Giống NOW(), lấy timestamp hiện tại
+5. `LOCALTIMESTAMP`: Lấy timestamp hiện tại nhưng không có thông tin múi giờ
+6. `LOCALTIME`: Lấy giờ hiện tại nhưng không có múi giờ
+### Chuyển đổi và định dạng thời gian
+1. `TO_CHAR(timestamp, format)`: Chuyển đổi timestamp sang chuỗi với định dạng mong muốn
+2. `TO_TIMESTAMP(text, format)`: Chuyển đổi chuỗi thành timestamp
+3. `TO_DATE(text, format)`: Chuyển đổi chuỗi thành date
+### Trích xuất thông tin từ thời gian
+1. `EXTRACT(field FROM timestamp)`: Lấy giá trị cụ thể từ timestamp (năm, tháng, ngày, giờ, phút, giây, tuần, quý,...)
+2. `DATE_PART(field, timestamp)`: Giống EXTRACT, dùng để lấy phần cụ thể của timestamp
+3. `DATE_TRUNC(field, timestamp)`: Làm tròn timestamp về một phần cụ thể (ngày, tháng, năm,...)
+### Tính toán với thời gian
+1. `AGE(timestamp1, timestamp2)`: Tính khoảng cách thời gian giữa hai timestamp
+2. `JUSTIFY_DAYS(interval)`: Chuẩn hóa giá trị ngày trong khoảng thời gian
+3. `JUSTIFY_HOURS(interval)`: Chuẩn hóa giá trị giờ trong khoảng thời gian
+4. `JUSTIFY_INTERVAL(interval)`: Chuẩn hóa khoảng thời gian (cả ngày, giờ)
+### Thao tác cộng/trừ thời gian
+1. `timestamp + interval`: Cộng thêm khoảng thời gian vào timestamp
+2. `timestamp - interval`: Trừ khoảng thời gian khỏi timestamp
+3.`date + integer`: Cộng số ngày vào một ngày cụ thể
+4. `date - integer`: Trừ số ngày khỏi một ngày cụ thể
+5. `date - date`: Tính số ngày giữa hai ngày
+### Tạo khoảng thời gian
+1. `MAKE_INTERVAL(years, months, days, hours, mins, secs)`: Tạo khoảng thời gian từ các phần tử cụ thể
+2. `MAKE_DATE(year, month, day)`: Tạo một giá trị DATE từ các thành phần số
+3. `MAKE_TIME(hour, minute, second)`: Tạo một giá trị TIME từ các thành phần số
+4. `MAKE_TIMESTAMP(year, month, day, hour, minute, second)`: Tạo một TIMESTAMP từ các thành phần số
 ## BIỂU THỨC CHÍNH QUY (REGULAR EXPRESSION HAY REGEX) TRONG SQL
 Biểu thức chính quy trong SQL là một công cụ mạnh mẽ để tìm kiếm, so khớp và thao tác chuỗi ký tự dựa trên các mẫu (patterns) xác định. Biểu thức chính quy cho phép bạn xác định các mẫu phức tạp và tìm kiếm các chuỗi phù hợp với các mẫu đó.
 
