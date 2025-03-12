@@ -326,4 +326,21 @@ from employee A
 left join bonus B on A.empid = B.empid
 where bonus < 1000 or bonus is null
 
---
+--1280
+select
+    cte.student_id,
+    cte.student_name,
+    cte.subject_name,
+    coalesce(count(C.subject_name),0) as attended_exams
+from
+(
+select
+    A.*,
+    B.*
+from students A
+cross join subjects B
+) cte
+left join examinations C on cte.student_id = C.student_id
+and cte.subject_name = C.subject_name
+group by cte.student_id,cte.student_name,cte.subject_name
+order by student_id, subject_name
