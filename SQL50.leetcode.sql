@@ -242,3 +242,88 @@ from Employee A
 ) cte
 join Department B on cte.departmentId = B.id
 where rank <= 3
+
+--1378
+select
+    unique_id,
+    name
+from employees A
+left join employeeuni B on A.id = B.id
+
+--1068
+  select
+    product_name,
+    year,
+    price
+from sales A
+join product B on A.product_id = B.product_id
+
+--1581
+select
+    customer_id,
+    count(*) as count_no_trans
+from visits A
+left join transactions B on A.visit_id = B.visit_id
+where transaction_id is null
+group by customer_id
+
+--197
+select
+  today.Id
+from weather today
+cross join weather yesterday
+where date(today.recorddate) - date(yesterday.recorddate) = 1
+    and today.temperature > yesterday.temperature
+
+--1661
+select
+    machine_id,
+    round(avg(end_point::decimal-timestamp::decimal),3) as processing_time
+from
+(
+select *,
+    lead(timestamp) over (partition by machine_id, process_id order by timestamp) as end_point
+from activity
+) cte
+where end_point is not null
+group by machine_id
+
+--Hoặc
+select
+machine_id,
+round(
+    avg(
+        case
+        when activity_type = 'start' then -timestamp
+        else timestamp
+        end
+    ) :: decimal * 2,3
+) processing_time
+from activity
+group by machine_id
+order by machine_id
+
+--Hoặc
+select
+    cte.machine_id,
+    round(avg(cte.timestamp::decimal-A.timestamp::decimal),3) as processing_time
+from
+(
+select *
+from activity
+where activity_type != 'start'
+) cte
+join activity A on cte.machine_id = A.machine_id
+and cte.process_id = A.process_id
+where cte.timestamp != A.timestamp
+group by cte.machine_id
+
+--577
+select
+    name,
+    bonus
+from employee A
+left join bonus B on A.empid = B.empid
+where bonus < 1000 or bonus is null
+
+--
