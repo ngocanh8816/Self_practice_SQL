@@ -344,3 +344,156 @@ left join examinations C on cte.student_id = C.student_id
 and cte.subject_name = C.subject_name
 group by cte.student_id,cte.student_name,cte.subject_name
 order by student_id, subject_name
+
+--570
+  select
+    name
+from employee
+where id in
+(
+select
+    managerid
+from employee
+group by managerid
+having count(id) >= 5
+)
+
+--1934
+select
+    B.user_id,
+    round(coalesce(avg((action='confirmed')::int),0),2) as confirmation_rate
+from confirmations A
+right join signups B on A.user_id = B.user_id
+group by B.user_id
+
+--1731
+with cte as
+(
+select
+    reports_to
+from employees
+group by reports_to
+having count(*) >= 1
+)
+
+select
+    A.employee_id,name,
+    reports_count,average_age
+from
+(
+select
+    reports_to as employee_id,
+    count(*) as reports_count,
+    round(avg(age)::decimal) as average_age
+from employees
+where reports_to in (select * from cte)
+group by reports_to
+) A
+join employees B on A.employee_id = B.employee_id
+order by A.employee_id
+
+--Hoặc
+select
+    B.reports_to as employee_id,
+    A.name,
+    count(*) as reports_count,
+    round(avg(B.age)::decimal,0) as average_age
+from employees A
+join employees B on A.employee_id = B.reports_to
+group by B.reports_to,A.name
+order by employee_id
+
+--1789
+select
+    employee_id,
+    department_id
+from employee
+where employee_id in
+(
+select
+    employee_id
+from employee
+group by employee_id
+having count(*) = 1
+)
+or primary_flag = 'Y'
+
+--610
+select *,
+    case
+    when x+y>z and x+z>y and y+z>x then 'Yes'
+    else 'No'
+    end triangle
+from triangle
+
+--180
+select
+    distinct num as ConsecutiveNums
+from
+(
+select *,
+    lead(num) over (order by id) as t1,
+    lead(num,2) over (order by id) as t2
+from logs
+) cte
+where num = t1 and num = t2
+
+--1164
+select
+    B.product_id,
+    coalesce(new_price,10) as price
+from
+(
+select
+    product_id,
+    max(change_date) as change_date
+from products
+where change_date <= to_date('2019-08-16','yyyy-mm-dd')
+group by product_id
+) cte
+join products A on cte.product_id = A.product_id
+and cte.change_date = A.change_date
+right join (select distinct product_id from products) B
+on cte.product_id = B.product_id
+--Hoặc sử dụng ROW_NUMBER()
+
+--1204
+select
+    person_name
+from
+(
+select
+    person_name,
+    sum(weight) over (order by turn) as total_weight
+from queue
+) cte1
+where total_weight <= 1000
+order by total_weight desc
+limit 1
+
+--1907
+with cte1 as
+(
+select'Low Salary' as category
+union
+select 'Average Salary'
+union
+select 'High Salary'
+)
+
+select
+    cte1.category,
+    coalesce(accounts_count,0) as accounts_count
+from
+(
+select
+    case
+    when income < 20000 then 'Low Salary'
+    when income between 20000 and 50000 then 'Average Salary'
+    else 'High Salary'
+    end as category,
+    count(*) as accounts_count
+from accounts
+group by category
+) cte2
+right join cte1 on cte2.category = cte1.category
