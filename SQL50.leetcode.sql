@@ -497,3 +497,72 @@ from accounts
 group by category
 ) cte2
 right join cte1 on cte2.category = cte1.category
+
+--1251
+select
+    A.product_id,
+    coalesce(round(sum(price*units)/sum(units)::decimal,2),0) as average_price
+from prices A
+left join unitssold B on A.product_id = B.product_id
+where purchase_date between start_date and end_date or purchase_date is null
+group by A.product_id
+
+--1633
+select
+    contest_id,
+    round(count(*)*100/(select count(*) from users)::decimal,2) as percentage
+from register
+group by contest_id
+order by percentage desc, contest_id
+
+--1211
+  select
+    query_name,
+    round(avg(rating/position::decimal),2) as quality,
+    round(avg((rating<3)::int)::decimal*100,2) as poor_query_percentage
+from queries
+group by query_name
+
+--1193
+select
+    to_char(trans_date,'yyyy-mm') as month,
+    country,
+    count(*) as trans_count,
+    sum((state='approved')::int) as approved_count,
+    sum(amount) as trans_total_amount,
+    sum(
+        case
+        when state = 'approved' then amount
+        else 0
+        end) approved_total_amount
+from transactions
+group by country,to_char(trans_date,'yyyy-mm')
+
+--1174
+select
+    round(avg((order_date = customer_pref_delivery_date)::int)::decimal*100,2) as
+    immediate_percentage 
+from
+(
+select
+    customer_id,
+    min(order_date) as min_date
+from delivery
+group by customer_id
+) cte
+join delivery A on cte.customer_id = A.customer_id
+where order_date = min_date
+
+--550
+select
+    round(sum((min_date + 1 = event_date)::int)/
+    count(distinct A.player_id)::decimal,2) as fraction
+from
+(
+select
+    player_id,
+    min(event_date) as min_date
+from activity
+group by player_id
+) cte
+join activity A on cte.player_id = A.player_id
