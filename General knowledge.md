@@ -539,7 +539,13 @@ COMMIT;
 
 
 # TRIGGER TRONG SQL
-Trigger trong SQL là một loại thủ tục đặc biệt được tự động thực thi khi có một sự kiện cụ thể xảy ra trong cơ sở dữ liệu, một bảng (table) hoặc dạng xem (view)
+Trigger trong PostgreSQL là một cơ chế tự động thực thi một hàm (function) khi có một sự kiện (INSERT, UPDATE, DELETE) xảy ra trong cơ sở dữ liệu, một bảng (table) hoặc dạng xem (view).
+
+Nó giúp đảm bảo tính toàn vẹn dữ liệu, kiểm tra điều kiện nghiệp vụ hoặc tự động hóa các tác vụ.
+
+Trigger có thể hoạt động ở 2 cấp:
+- Row-Leval Trigger: Kích hoạt cho từng dòng bị ảnh hưởng bởi câu lệnh SQL\
+- Statement-Level Trigger: Kích hoạt một lần cho toàn bộ câu lệnh SQL (bất kể có bao nhiêu dòng bị ảnh hưởng)
 
 Các sự kiện có thể kích hoạt trigger bao gồm:
 - Insert
@@ -565,6 +571,27 @@ Các loại Trigger:
 
   Cụ thể, trigger INSTEAD OF cho phép bạn thực hiện các hành động tùy chỉnh thay vì thực hiện lệnh DML gốc. Điều này có thể hữu ích khi bạn muốn kiểm tra hoặc can thiệp vào dữ liệu trước khi nó được ghi vào cơ sở dữ liệu hoặc bạn muốn thực hiện hành động không phải là lệnh DML trực tiếp.
   Ví dụ, nếu abnj có 1 view hoặc 1 bảng và bạn muốn áp dụng quy tắc kiểm tra trước khi cho phép các lệnh INSERT hoặc UPDATE, bạn có thể sử dụng trigger này để kiểm tra dữ liệu và thay đổi dữ liệu trước khi nó được ghi vào cơ sở dữ liệu.
+  
 Cú pháp
+
+Bước 1: Tạo Trigger Function
 ```
+CREATE OR REPLACE FUNCTION function_name()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Logic xử lý
+    RETURN NEW;  -- hoặc RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+```
+- `NEW`: Chứa dữ liệu mới khi được thực hiện `INSSERT` hoặc `UPDATE`
+- `OLD`: Chứa dữ liệu cũ khi thực hiện `UPDATE` hoặc `DELETE`
+Bước 2: Tạo Trigger và liên kết với bảng
+```
+CREATE TRIGGER trigger_name
+{ BEFORE | AFTER | INSTEAD OF } { INSERT | UPDATE | DELETE | TRUNCATE }
+ON table_name
+[ FOR EACH { ROW | STATEMENT } ]
+[ WHEN (condition) ]
+EXECUTE FUNCTION function_name();
 ```
