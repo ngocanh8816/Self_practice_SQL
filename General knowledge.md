@@ -536,3 +536,35 @@ COMMIT;
 - Có thể sử dụng các lệnh như FETCH để lấy dữ liệu từng phần (thay vì lấy hết một lúc).
 - Thích hợp để xử lý tập dữ liệu lớn mà không làm hệ thống bị quá tải. Điều này giúp lấy dữ liệu từng phần, tối ưu hiệu suất khi làm việc với tập dữ liệu lớn.
 - Khi không cần dùng nữa, đừng quên CLOSE con trỏ để giải phóng tài nguyên.
+
+
+# TRIGGER TRONG SQL
+Trigger trong SQL là một loại thủ tục đặc biệt được tự động thực thi khi có một sự kiện cụ thể xảy ra trong cơ sở dữ liệu, một bảng (table) hoặc dạng xem (view)
+
+Các sự kiện có thể kích hoạt trigger bao gồm:
+- Insert
+- Update
+- Delete
+- DDL (Data Defination Language)
+- DML (Data Manipulation Language)
+
+Các loại Trigger:
+- Trigger Before (hoặc 'BEFORE INSERT', 'BEFORE UPDATE','BEFORE DELETE'): kích hoạt trước khi sự kiện xảy ra.
+
+    Trigger BEFORE thường được sử dụng để kiểm tra hoặc can thiệp vào dữ liệu trước khi lệnh INSERT, UPDATE, DELETE được thực hiện hoặc để kiểm tra và thay đổi dữ liệu trước khi nó được cập nhật.
+
+    Trigger BEFORE có khả năng ảnh hưởng đến dữ liệu trước hi nó được ghi nhận vào cơ sở dữ liệu. Ngoài ra nó còn được sử dụng để cản trở cập nhật dữ liệu nếu cần
+
+    Ví dụ, kiểm tra giá trị dữ liệu trước khi thực hiện chèn bảng để đảm bảo tính hợp lệ
+- Trigger After (hoặc 'AFTER INSERT', 'AFTER UPDATE','AFTER DELETE'): kích hoạt sau khi sự kiện xảy ra và dữ liệu đã được thay đổi trong cơ sở dữ liệu.
+
+    Trigger AFTER thường được sử dụng để thực hiện các hành động sau khi dữ liệu đã được thay đổi. Trigger AFTER có thể truy cập vào dữ liệu đã được cập nhật và sử dụng nó trong các hành động khác
+
+    Ví dụ, ghi log lại các thay đổi đã xảy ra trong bảng hoặc cập nhật các bảng liên quan
+- Trigger INSTEAD OF là 1 loại khác của trigger trong SQL. Thường được sử dụng để thay đổi hoặc kiểm tra dữ liệu trước khi câu lệnh INSERT, UPDATE hay DELETE được thực hiển trên 1 view haocjw 1 bảng. Nó thay thế lệnh DML gốc bằng hành động bạn xác định trong trigger
+
+  Cụ thể, trigger INSTEAD OF cho phép bạn thực hiện các hành động tùy chỉnh thay vì thực hiện lệnh DML gốc. Điều này có thể hữu ích khi bạn muốn kiểm tra hoặc can thiệp vào dữ liệu trước khi nó được ghi vào cơ sở dữ liệu hoặc bạn muốn thực hiện hành động không phải là lệnh DML trực tiếp.
+  Ví dụ, nếu abnj có 1 view hoặc 1 bảng và bạn muốn áp dụng quy tắc kiểm tra trước khi cho phép các lệnh INSERT hoặc UPDATE, bạn có thể sử dụng trigger này để kiểm tra dữ liệu và thay đổi dữ liệu trước khi nó được ghi vào cơ sở dữ liệu.
+Cú pháp
+```
+```
