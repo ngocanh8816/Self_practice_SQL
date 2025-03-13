@@ -88,7 +88,7 @@
 ### Thao tác cộng/trừ thời gian
 1. `timestamp + interval`: Cộng thêm khoảng thời gian vào timestamp
 2. `timestamp - interval`: Trừ khoảng thời gian khỏi timestamp
-3.`date + integer`: Cộng số ngày vào một ngày cụ thể
+3. `date + integer`: Cộng số ngày vào một ngày cụ thể
 4. `date - integer`: Trừ số ngày khỏi một ngày cụ thể
 5. `date - date`: Tính số ngày giữa hai ngày
 ### Tạo khoảng thời gian
