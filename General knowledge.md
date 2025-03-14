@@ -586,6 +586,7 @@ $$ LANGUAGE plpgsql;
 ```
 - `NEW`: Chứa dữ liệu mới khi được thực hiện `INSSERT` hoặc `UPDATE`
 - `OLD`: Chứa dữ liệu cũ khi thực hiện `UPDATE` hoặc `DELETE`
+
 Bước 2: Tạo Trigger và liên kết với bảng
 ```
 CREATE TRIGGER trigger_name
@@ -595,3 +596,20 @@ ON table_name
 [ WHEN (condition) ]
 EXECUTE FUNCTION function_name();
 ```
+## Khi tạo Trigger, việc khai báo `FOR EACH ROW` hoặc `FOR EACH STATEMENT` có sự khác biệt như thế nào?
+Khi tạo trigger trong cơ sở dữ liệu, việc sử dụng FOR EACH ROW và FOR EACH STATEMENT quyết định cách trigger sẽ được thực thi
+
+FOR EACH ROR
+- Kích hoạt cho mỗi bản ghi (row): Trigger sẽ thực thi cho mỗi bản ghi bị ảnh hưởng bởi câu lệnh DML (INSERT, UPDATE, DELETE).
+
+- Chi tiết và cụ thể: Thường được sử dụng khi bạn cần kiểm tra, thay đổi hoặc ghi nhận dữ liệu cho từng bản ghi riêng lẻ.
+
+- Ví dụ: Khi bạn cập nhật 10 bản ghi trong bảng, trigger với `FOR EACH ROW` sẽ kích hoạt 10 lần, một lần cho mỗi bản ghi.
+
+FOR EACH STATEMENT
+- Kích hoạt cho mỗi câu lệnh (statement): Trigger sẽ thực thi một lần cho toàn bộ câu lệnh DML, bất kể câu lệnh đó ảnh hưởng đến bao nhiêu bản ghi.
+
+- Hiệu suất cao hơn: Thường được sử dụng khi bạn cần thực hiện một tác vụ chỉ một lần cho toàn bộ câu lệnh, giúp tiết kiệm tài nguyên và thời gian.
+
+- Ví dụ: Khi bạn cập nhật 10 bản ghi trong bảng, trigger với `FOR EACH STATEMENT` sẽ kích hoạt chỉ một lần cho toàn bộ câu lệnh cập nhật.
+
