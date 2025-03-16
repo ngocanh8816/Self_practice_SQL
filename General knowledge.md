@@ -613,3 +613,53 @@ FOR EACH STATEMENT
 
 - Ví dụ: Khi bạn cập nhật 10 bản ghi trong bảng, trigger với `FOR EACH STATEMENT` sẽ kích hoạt chỉ một lần cho toàn bộ câu lệnh cập nhật.
 
+### Tại sao `BEFORE TRIGGER` có thể sửa những giá trị `NEW` còn `AFTER TRIGGER` thì không?
+Đó chính là do thời điểm thực thi các Trigger này trong quy trình xử lý dữ liệu của PostgreSQL
+
+Với Trigger Before:
+- Thời điểm hoạt động: Trigger `BEFORE` được kích hoạt trước khi câu lệnh SQL được thực thi và ghi dữ liệu vào bảng.
+- Vai trò của `NEW`:
+  - Trong `BEFORE` trigger, `NEW` đại diện cho bản ghi mới sắp được ghi vào bảng.
+  - PostgreSQL cho phép bạn thay đổi giá trị của NEW vì dữ liệu vẫn nằm trong giai đoạn "chuẩn bị" và chưa thực sự được lưu.
+  - Bất kỳ thay đổi nào trên `NEW` (như chỉnh sửa giá trị cột, tính toán lại dữ liệu, chuẩn hóa chuỗi trước khi lưu,...) sẽ được áp dụng và sau đó ghi vào bảng.
+ 
+Với Trigger After:
+- Thời điểm hoạt động: Trigger `AFTER` được kích hoạt sau khi câu lệnh SQL đã hoàn tất và dữ liệu đã được ghi vào bảng.
+- Vai trò của `NEW`:
+    - Trong `AFTER` trigger, NEW đại diện cho bản ghi đã được ghi thành công vào bảng.
+    - Vì thao tác ghi đã hoàn tất, PostgreSQL không cho phép chỉnh sửa giá trị `NEW` nữa. Bất kỳ thay đổi nào trong trigger `AFTER` chỉ có thể sử dụng để thực hiện các tác vụ khác như: ghi log, kích hoạt xử lý bổ sung (ví dụ: gửi thông báo, cập nhật bảng khác),...
+ 
+Tổng hợp
+1. `Trigger BEFORE`
+   - Trước khi dữ liệu được lưu vào Database
+   - Có thể thay đổi giá trị `NEW`
+   - Sửa đổi hoặc kiểm tra dữ liệu trước khi chèn hoặc cập nhật
+3. `Trigger AFTER`
+   - Sau khi dữ liệu được lưu vào Database
+   - Không thể thay đổi gái trị `NEW`
+   - Kích hoạt hành động khác (ghi log, cập nhật bảng khác, gửi thông báo...)
+  
+### Với `BEFORE TRIGGER` và `AFTER TRIGGER` vài trò của các giá trị `OLD` là gì?
+Vai trò của `OLD` trong các trigger (cả `BEFORE` và `AFTER`) phụ thuộc vào loại thao tác (`INSERT`, `UPDATE`, `DELETE`) và thời điểm trigger được thực thi.
+
+Với Trigger Before:
+- INSERT:
+    - Trong thao tác `INSERT`, không tồn tại bản ghi cũ nào, vì vậy `OLD` không có giá trị. Trigger `BEFORE INSERT` chỉ làm việc với `NEW`.
+- UPDATE:
+    - Trong thao tác `UPDATE`, `OLD` đại diện cho dữ liệu cũ của bản ghi trước khi bị thay đổi.
+    - Bạn có thể sử dụng `OLD` để so sánh với NEW nhằm kiểm tra điều kiện hoặc thực hiện logic cụ thể trước khi ghi bản ghi mới.
+- DELETE:
+    - Trong thao tác `DELETE`, `OLD` chứa bản ghi sắp bị xóa.
+    - Bạn có thể sử dụng thông tin trong `OLD` để thực hiện kiểm tra hoặc chuẩn bị logic trước khi xóa bản ghi.
+ 
+Với Trigger After:
+- INSERT:
+    - Trong thao tác `INSERT`, không có bản ghi cũ nào được thay thế, vì vậy `OLD` không có giá trị.
+- UPDATE:
+    - Trong thao tác `UPDATE`, `OLD` chứa dữ liệu của bản ghi trước khi bị cập nhật.
+    - Trong trigger `AFTER UPDATE`, bạn sử dụng `OLD` (kết hợp với `NEW`) để kiểm tra sự thay đổi dữ liệu, ghi log, hoặc thực hiện các hành động bổ sung.
+- DELETE:
+    - Trong thao tác `DELETE`, `OLD` chứa dữ liệu đã bị xóa.
+    - Trong trigger `AFTER DELETE`, `OLD` thường được dùng để ghi log hoặc thực hiện hành động dựa trên thông tin của bản ghi đã xóa.
+
+
