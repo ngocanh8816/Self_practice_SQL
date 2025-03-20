@@ -662,4 +662,48 @@ Với Trigger After:
     - Trong thao tác `DELETE`, `OLD` chứa dữ liệu đã bị xóa.
     - Trong trigger `AFTER DELETE`, `OLD` thường được dùng để ghi log hoặc thực hiện hành động dựa trên thông tin của bản ghi đã xóa.
 
+#VIEW
+Trong PostgreSQL, view là một bảng ảo không lưu trữ dữ liệu thực, mà thay vào đó là một tập hợp các kết quả truy vấn SQL. Nó có thể được coi như một cách để đơn giản hóa và tổ chức dữ liệu phức tạp từ các bảng khác.
 
+**Ý nghĩa của `VIEW`**
+
+*Tổ chức và đơn giản hóa*
+
+- `VIEW` giúp bạn tránh phải viết lại truy vấn phức tạp bằng cách tạo một truy vấn duy nhất và lưu dưới dạng VIEW
+
+*Bảo mật*
+
+Bạn có thể tạo view để cung cấp một góc nhìn giới hạn về dữ liệu, chỉ hiển thị các cột hoặc dòng cụ thể mà người dùng được phép xem.
+
+*Tăng hiệu suất làm việc*
+
+Giảm thời gian viết lại truy vấn và cải thiện khả năng tái sử dụng mã SQL.
+
+*Trừu tượng hóa*
+
+Ẩn chi tiết cấu trúc phức tạp của bảng, cung cấp một cách tiếp cận đơn giản và dễ hiểu cho người dùng.
+
+**Tạo `VIEW`**
+```
+CREATE VIEW employee_view AS
+SELECT id, name, department
+FROM employees
+WHERE department = 'Sales';
+```
+**Sử dụng `VIEW`**
+```
+SELECT * FROM employee_view;
+```
+**Cập nhật `VIEW`**
+
+View được cập nhật tự động khi dữ liệu trong bảng nguồn thay đổi.
+
+Tuy nhiên, không phải lúc nào bạn cũng có thể thực hiện các thao tác chỉnh sửa (INSERT, UPDATE, DELETE) trực tiếp trên view; điều này phụ thuộc vào truy vấn trong view.
+
+**Xóa `VIEW`**
+```
+DROP VIEW employee_view;
+```
+**Khi nào nên sử dụng `VIEW`**
+
+Khi bạn cần tổ chức dữ liệu phức tạp, tái sử dụng truy vấn, hoặc muốn bảo mật dữ liệu bằng cách giới hạn quyền truy cập.
